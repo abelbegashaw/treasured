@@ -167,10 +167,10 @@ export default function Home() {
           <div className="flex items-center gap-3 flex-nowrap">
             <p className="min-w-0 flex-1 truncate text-xs uppercase tracking-[0.25em] text-muted sm:text-sm sm:tracking-[0.3em]">List for Two</p>
             <Link
-              href="/valentine"
+              href="/journey"
               className="rounded-full bg-[color:var(--accent)] px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white shadow-sm transition hover:bg-[color:var(--rose)] whitespace-nowrap sm:px-4 sm:text-xs sm:tracking-[0.2em]"
             >
-              Open Valentine.exe
+              Journey so far ...
             </Link>
           </div>
           <h1 className="mt-4 text-4xl font-semibold leading-tight text-deep sm:text-5xl">

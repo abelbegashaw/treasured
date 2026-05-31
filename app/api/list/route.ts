@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { getDatabase } from "@/lib/firebaseAdmin"
+import { loadList, saveList } from "@/lib/listStore"
 
 type ListItem = {
   id: string
   label: string
   done: boolean
-}
-
-type ListDocument = {
-  _id: string
-  items: ListItem[]
-  updatedAt: string
 }
 
 const listDocId = "shared"
@@ -29,21 +23,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const listRef = getDatabase().ref(`lists/${listDocId}`)
-    const snapshot = await listRef.get()
-
-    if (!snapshot.exists()) {
-      const items: ListItem[] = []
-      await listRef.set({
-        _id: listDocId,
-        items,
-        updatedAt: new Date().toISOString(),
-      })
-      return NextResponse.json({ items })
-    }
-
-    const doc = snapshot.val() as ListDocument
-    const items = Array.isArray(doc?.items) ? doc.items : []
+    const items = await loadList(listDocId)
     return NextResponse.json({ items })
   } catch (error) {
     console.error("GET /api/list error:", error)
@@ -79,12 +59,7 @@ export async function POST(request: Request) {
     }))
 
   try {
-    const listRef = getDatabase().ref(`lists/${listDocId}`)
-    await listRef.set({
-      _id: listDocId,
-      items,
-      updatedAt: new Date().toISOString(),
-    })
+    await saveList(listDocId, items)
 
     return NextResponse.json({ ok: true })
   } catch (error) {
