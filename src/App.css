@@ -1,0 +1,15 @@
+/* The default Vite template (index.css) constrains #root to a fixed
+   1126px width with side borders and centers text — that fought with
+   this app's full-bleed paper background, so it's neutralized here. */
+   #root {
+    width: 100%;
+    max-width: none;
+    border-inline: none;
+    text-align: left;
+    display: block;
+    min-height: 100svh;
+  }
+  
+  body {
+    margin: 0;
+  }
