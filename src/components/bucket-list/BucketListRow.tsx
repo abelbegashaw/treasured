@@ -23,8 +23,8 @@ export function BucketListRow({ item, index, total, photoCount, isEditing, editi
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
+        alignItems: 'flex-start',
+        gap: 'clamp(10px, 3vw, 16px)',
         padding: '18px 4px',
         borderBottom: `1px solid ${theme.line}`,
       }}
@@ -65,13 +65,12 @@ export function BucketListRow({ item, index, total, photoCount, isEditing, editi
             onClick={() => onStartEdit(item.id, item.title)}
             style={{
               fontSize: '15px',
+              lineHeight: 1.4,
               color: item.isCompleted ? `${theme.muted}80` : theme.ink,
               textDecoration: item.isCompleted ? 'line-through' : 'none',
               cursor: 'text',
               display: 'block',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              overflowWrap: 'anywhere',
             }}
           >
             {item.title}
