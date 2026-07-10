@@ -2,19 +2,20 @@ import { useMemo } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { milestoneMonths } from '../../lib/milestoneMonths';
 import { MilestoneNode } from './MilestoneNode';
-import type { Milestone } from '../../types';
+import type { GalleryImage, Milestone } from '../../types';
 
 interface MilestoneTimelineProps {
   anchorDate: string; // 'YYYY-MM-DD'
   milestonesByMonth: Map<number, Milestone>;
   busyMonth: number | null;
-  onAdd: (monthNumber: number, file: File, note: string) => void;
-  onRemove: (monthNumber: number) => void;
+  uploadProgress: { done: number; total: number };
+  onAdd: (monthNumber: number, files: File[], picks: GalleryImage[], note: string) => void;
+  onRemove: (monthNumber: number, mediaId: string) => void;
 }
 
 // The left-rail single-column timeline: a hairline spine with a node per month
 // from the beginning up to now, oldest at the top.
-export function MilestoneTimeline({ anchorDate, milestonesByMonth, busyMonth, onAdd, onRemove }: MilestoneTimelineProps) {
+export function MilestoneTimeline({ anchorDate, milestonesByMonth, busyMonth, uploadProgress, onAdd, onRemove }: MilestoneTimelineProps) {
   const theme = useTheme();
   const slots = useMemo(() => milestoneMonths(anchorDate), [anchorDate]);
   const filledCount = milestonesByMonth.size;
@@ -42,6 +43,7 @@ export function MilestoneTimeline({ anchorDate, milestonesByMonth, busyMonth, on
             milestone={milestonesByMonth.get(slot.monthNumber) ?? null}
             busy={busyMonth === slot.monthNumber}
             disabled={busyMonth !== null && busyMonth !== slot.monthNumber}
+            uploadProgress={uploadProgress}
             onAdd={onAdd}
             onRemove={onRemove}
           />

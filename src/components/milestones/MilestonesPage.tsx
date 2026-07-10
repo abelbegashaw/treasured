@@ -13,10 +13,11 @@ export function MilestonesPage() {
     pageError,
     savingAnchor,
     busyMonth,
+    uploadProgress,
     error,
     setAnchorDate,
-    addMilestone,
-    removeMilestone,
+    addMilestoneMedia,
+    removeMilestoneMedia,
     reload,
   } = useMilestones();
 
@@ -40,8 +41,9 @@ export function MilestonesPage() {
           anchorDate={anchorDate}
           milestonesByMonth={milestonesByMonth}
           busyMonth={busyMonth}
-          onAdd={addMilestone}
-          onRemove={removeMilestone}
+          uploadProgress={uploadProgress}
+          onAdd={addMilestoneMedia}
+          onRemove={removeMilestoneMedia}
         />
       )}
     </div>

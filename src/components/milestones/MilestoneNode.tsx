@@ -1,36 +1,39 @@
 import { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { milestonePhoto } from '../../lib/cloudinaryUrl';
+import { MilestoneMediaStrip } from './MilestoneMediaStrip';
+import { MediaComposer } from './MediaComposer';
+import { MediaLightbox } from '../media/MediaLightbox';
 import type { MonthSlot } from '../../lib/milestoneMonths';
-import type { Milestone } from '../../types';
+import type { GalleryImage, Milestone } from '../../types';
 
 interface MilestoneNodeProps {
   slot: MonthSlot;
   milestone: Milestone | null;
-  busy: boolean;      // this month's photo is uploading
-  disabled: boolean;  // another month is mid-upload — block starting a second
-  onAdd: (monthNumber: number, file: File, note: string) => void;
-  onRemove: (monthNumber: number) => void;
+  busy: boolean;      // this month is uploading
+  disabled: boolean;  // another month is mid-upload
+  uploadProgress: { done: number; total: number };
+  onAdd: (monthNumber: number, files: File[], picks: GalleryImage[], note: string) => void;
+  onRemove: (monthNumber: number, mediaId: string) => void;
 }
 
-// One marker on the timeline rail: a node dot, its label + calendar date, and
-// either the attached photo (+ note) or an inline "add photo" form.
-export function MilestoneNode({ slot, milestone, busy, disabled, onAdd, onRemove }: MilestoneNodeProps) {
+// One marker on the timeline rail: a node dot, its label + calendar date, the
+// month's media carousel (+ note), and controls to add media or open fullscreen.
+export function MilestoneNode({ slot, milestone, busy, disabled, uploadProgress, onAdd, onRemove }: MilestoneNodeProps) {
   const theme = useTheme();
-  const [adding, setAdding] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [note, setNote] = useState('');
-  const filled = milestone !== null;
+  const [composing, setComposing] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const resetForm = () => {
-    setAdding(false);
-    setFile(null);
-    setNote('');
+  const media = milestone?.media ?? [];
+  const hasMedia = media.length > 0;
+
+  const handlePost = (files: File[], picks: GalleryImage[], note: string) => {
+    onAdd(slot.monthNumber, files, picks, note);
+    setComposing(false);
   };
 
   return (
-    <div style={{ position: 'relative', paddingBottom: '36px' }}>
-      {/* Node dot sitting on the rail. Solid accent when filled, hollow when empty. */}
+    <div style={{ position: 'relative', paddingBottom: '40px' }}>
+      {/* Node dot on the rail. Solid accent when the month has media, else hollow. */}
       <span
         aria-hidden="true"
         style={{
@@ -39,8 +42,8 @@ export function MilestoneNode({ slot, milestone, busy, disabled, onAdd, onRemove
           top: '3px',
           width: '9px',
           height: '9px',
-          backgroundColor: filled ? theme.accent : theme.canvas,
-          border: filled ? 'none' : `1px solid ${theme.line}`,
+          backgroundColor: hasMedia ? theme.accent : theme.canvas,
+          border: hasMedia ? 'none' : `1px solid ${theme.line}`,
         }}
       />
 
@@ -49,75 +52,48 @@ export function MilestoneNode({ slot, milestone, busy, disabled, onAdd, onRemove
         <span style={{ fontSize: '12px', color: theme.muted }}>· {slot.dateLabel}</span>
       </div>
 
-      {filled ? (
-        <div style={{ marginTop: '12px', maxWidth: '360px' }}>
-          <img
-            src={milestonePhoto(milestone.url)}
-            alt={`${slot.label} — ${slot.dateLabel}`}
-            loading="lazy"
-            style={{ display: 'block', width: '100%', aspectRatio: '4 / 5', objectFit: 'cover', border: `1px solid ${theme.line}` }}
+      {hasMedia && (
+        <div style={{ marginTop: '12px' }}>
+          <MilestoneMediaStrip
+            media={media}
+            onOpen={(i) => setLightboxIndex(i)}
+            onRemove={(mediaId) => onRemove(slot.monthNumber, mediaId)}
+            removeDisabled={disabled || busy}
           />
-          {milestone.note && (
+          {milestone?.note && (
             <p style={{ margin: '10px 2px 0', fontSize: '14px', lineHeight: 1.5, color: theme.muted }}>{milestone.note}</p>
           )}
-          <button
-            onClick={() => onRemove(slot.monthNumber)}
-            disabled={disabled}
-            style={{ marginTop: '8px', background: 'none', border: 'none', padding: '2px', color: theme.rose, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1, fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
-          >
-            Remove
-          </button>
         </div>
-      ) : adding ? (
-        <div style={{ marginTop: '12px', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <label
-            className="pill-input"
-            style={{ display: 'flex', alignItems: 'center', cursor: busy ? 'default' : 'pointer', color: file ? theme.ink : theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          >
-            {file ? file.name : 'Choose a photo…'}
-            <input
-              type="file"
-              accept="image/*"
-              disabled={busy}
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              style={{ display: 'none' }}
-            />
-          </label>
-          <input
-            type="text"
-            placeholder="A note (optional)…"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            disabled={busy}
-            className="pill-input"
-          />
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={() => file && onAdd(slot.monthNumber, file, note)}
-              className="pill-btn pill-btn-primary"
-              disabled={!file || busy || disabled}
-              style={{ opacity: !file || busy || disabled ? 0.5 : 1, cursor: !file || busy || disabled ? 'default' : 'pointer' }}
-            >
-              {busy ? 'Adding…' : 'Save'}
-            </button>
-            <button
-              onClick={resetForm}
-              className="pill-btn"
-              disabled={busy}
-              style={{ border: `1px solid ${theme.line}`, background: 'transparent', color: theme.ink }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+      )}
+
+      {busy && (
+        <p style={{ margin: '10px 2px 0', fontSize: '12px', color: theme.muted }}>
+          Uploading {uploadProgress.done}/{uploadProgress.total}…
+        </p>
+      )}
+
+      {composing ? (
+        <MediaComposer uploading={busy} progress={uploadProgress} onPost={handlePost} onCancel={() => setComposing(false)} />
       ) : (
-        <button
-          onClick={() => setAdding(true)}
-          disabled={disabled}
-          style={{ marginTop: '10px', background: 'none', border: `1px dashed ${theme.line}`, padding: '9px 14px', color: theme.muted, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1, fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
-        >
-          + Add photo
-        </button>
+        !busy && (
+          <button
+            onClick={() => setComposing(true)}
+            disabled={disabled}
+            style={{ marginTop: '10px', background: 'none', border: `1px dashed ${theme.line}`, padding: '9px 14px', color: theme.muted, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1, fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
+          >
+            {hasMedia ? '+ Add more' : '+ Add media'}
+          </button>
+        )
+      )}
+
+      {lightboxIndex !== null && hasMedia && (
+        <MediaLightbox
+          items={media}
+          startIndex={lightboxIndex}
+          caption={milestone?.note}
+          dateLabel={`${slot.label} · ${slot.dateLabel}`}
+          onClose={() => setLightboxIndex(null)}
+        />
       )}
     </div>
   );
