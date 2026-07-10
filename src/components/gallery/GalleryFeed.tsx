@@ -55,66 +55,77 @@ export function GalleryFeed({ images, startIndex, onClose, onRemove }: GalleryFe
     };
   }, [onClose]);
 
-  return createPortal(
-    <div
-      className="gallery-modal"
-      onClick={onClose}
-      style={{ position: 'fixed', inset: 0, zIndex: 50, overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }}
-    >
-      {/* Sticky top bar — stays put while the overlay scrolls. */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', color: '#fff' }}>
-        <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.85 }}>Gallery</span>
-        <button onClick={onClose} aria-label="Close" className="gallery-close">×</button>
-      </div>
+  return (
+    <>
+      {createPortal(
+        <div
+          className="gallery-modal"
+          onClick={onClose}
+          style={{ position: 'fixed', inset: 0, zIndex: 50, overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)' }}
+        >
+          {/* Sticky top bar — stays put while the overlay scrolls. */}
+          <div style={{ position: 'sticky', top: 0, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', color: '#fff' }}>
+            <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.85 }}>Gallery</span>
+            <button onClick={onClose} aria-label="Close" className="gallery-close">×</button>
+          </div>
 
-      {/* Full timeline. Clicks on the dark area around cards close; card clicks don't. */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '18px', padding: '0 12px 48px' }}>
-        {images.map((img, index) => (
-          <article
-            key={img.id}
-            ref={index === target ? targetRef : undefined}
-            onClick={(e) => e.stopPropagation()}
-            className="card-shadow gallery-modal-post"
-            style={{ scrollMarginTop: '72px', width: '100%', maxWidth: '500px', backgroundColor: theme.card, border: `1px solid ${theme.line}`, borderRadius: 0, overflow: 'hidden' }}
-          >
-            <img
-              src={galleryFull(img.url)}
-              alt={img.caption || 'Shared memory'}
-              // Tapped photo loads eagerly for an instant view; the rest lazy-load.
-              loading={index === target ? 'eager' : 'lazy'}
-              // Reserved 4:5 box keeps layout stable before load; contain shows the
-              // whole photo (letterboxed if it isn't 4:5) — never cropped.
-              style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'contain', display: 'block', backgroundColor: theme.canvas }}
-            />
-            <div style={{ padding: '14px 16px' }}>
-              {img.caption && (
-                <p style={{ margin: '0 0 6px 0', fontSize: '15px', fontWeight: 400, color: theme.ink }}>{img.caption}</p>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: theme.muted }}>
-                  {new Date(img.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-                <button
-                  onClick={() => setConfirmId(img.id)}
-                  style={{ background: 'none', border: 'none', color: theme.rose, cursor: 'pointer', fontSize: '12px', padding: 0, fontFamily: 'inherit' }}
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
+          {/* Full timeline. Clicks on the dark area around photos close; photo clicks don't. */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '40px', padding: '0 16px 56px' }}>
+            {images.map((img, index) => (
+              <figure
+                key={img.id}
+                ref={index === target ? targetRef : undefined}
+                onClick={(e) => e.stopPropagation()}
+                className="gallery-modal-post"
+                style={{ scrollMarginTop: '72px', margin: 0, width: '100%', maxWidth: '560px' }}
+              >
+                {/* Image floats directly on the dark overlay — no card chrome. The
+                    reserved 4:5 box keeps layout stable before load so the jump
+                    lands accurately; contain shows the whole photo, never cropped,
+                    with the letterbox transparent so it blends into the backdrop. */}
+                <img
+                  src={galleryFull(img.url)}
+                  alt={img.caption || 'Shared memory'}
+                  // Tapped photo loads eagerly for an instant view; the rest lazy-load.
+                  loading={index === target ? 'eager' : 'lazy'}
+                  style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'contain', display: 'block', backgroundColor: 'transparent' }}
+                />
+                <figcaption style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '16px', padding: '14px 2px 0', color: '#fff' }}>
+                  <span style={{ minWidth: 0 }}>
+                    {img.caption && (
+                      <span style={{ display: 'block', fontSize: '15px', fontWeight: 400, marginBottom: '4px' }}>{img.caption}</span>
+                    )}
+                    <span style={{ fontSize: '12px', opacity: 0.6 }}>
+                      {new Date(img.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </span>
+                  <button
+                    onClick={() => setConfirmId(img.id)}
+                    style={{ flexShrink: 0, background: 'none', border: 'none', color: theme.rose, cursor: 'pointer', fontSize: '12px', padding: 0, fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
+                  >
+                    Remove
+                  </button>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>,
+        document.body,
+      )}
 
-      {/* Delete confirmation — fixed so it stays centered regardless of scroll. */}
-      {confirmId && (
+      {/* Delete confirmation — its OWN portal, deliberately outside the blurred
+          overlay. `backdrop-filter` on .gallery-modal makes that element the
+          containing block for fixed descendants, which would pin this dialog to
+          the top of the scrolled content instead of the viewport. Kept separate,
+          `fixed` centers on the real viewport wherever you've scrolled to. */}
+      {confirmId && createPortal(
         <div
           onClick={(e) => { e.stopPropagation(); setConfirmId(null); }}
           style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'rgba(0,0,0,0.45)' }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="card-shadow gallery-modal-post"
+            className="gallery-modal-post"
             style={{ width: '100%', maxWidth: '330px', backgroundColor: theme.card, border: `1px solid ${theme.ink}`, borderRadius: 0, padding: '24px' }}
           >
             <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 400, color: theme.ink }}>Delete this photo?</h3>
@@ -138,9 +149,9 @@ export function GalleryFeed({ images, startIndex, onClose, onRemove }: GalleryFe
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
-    </div>,
-    document.body,
+    </>
   );
 }
