@@ -31,8 +31,8 @@ export function Header({ activeTab, onChangeTab }: HeaderProps) {
           <BrandMark size={16} glint={theme.sun} />
           <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.32em', color: theme.muted }}>Treasured</span>
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
-          <nav style={{ display: 'flex', gap: '22px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'clamp(14px, 4vw, 22px)' }}>
+          <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(14px, 4vw, 22px)' }}>
             <button className={`nav-pill ${activeTab === 'bucket' ? 'active' : ''}`} onClick={() => onChangeTab('bucket')}>Bucket</button>
             <button className={`nav-pill ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => onChangeTab('gallery')}>Gallery</button>
             <button className={`nav-pill ${activeTab === 'milestones' ? 'active' : ''}`} onClick={() => onChangeTab('milestones')}>Timeline</button>
