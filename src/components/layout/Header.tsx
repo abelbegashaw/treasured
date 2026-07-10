@@ -26,20 +26,21 @@ export function Header({ activeTab, onChangeTab }: HeaderProps) {
 
   return (
     <header className="reveal-up" style={{ position: 'relative', zIndex: 10, maxWidth: '760px', margin: '0 auto', padding: '48px 24px 0' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', paddingBottom: '18px', borderBottom: `1px solid ${theme.line}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px 20px', paddingBottom: '18px', borderBottom: `1px solid ${theme.line}` }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', color: theme.ink }}>
           <BrandMark size={16} glint={theme.sun} />
           <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.32em', color: theme.muted }}>Treasured</span>
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'clamp(14px, 4vw, 22px)' }}>
-          <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(14px, 4vw, 22px)' }}>
-            <button className={`nav-pill ${activeTab === 'bucket' ? 'active' : ''}`} onClick={() => onChangeTab('bucket')}>Bucket</button>
-            <button className={`nav-pill ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => onChangeTab('gallery')}>Gallery</button>
-            <button className={`nav-pill ${activeTab === 'milestones' ? 'active' : ''}`} onClick={() => onChangeTab('milestones')}>Timeline</button>
-            <button className={`nav-pill ${activeTab === 'us' ? 'active' : ''}`} onClick={() => onChangeTab('us')}>Us</button>
-          </nav>
-          <button className="nav-pill" onClick={() => signOut()} title="Sign out">Sign&nbsp;out</button>
-        </div>
+        {/* One wrapping row of links: on a wide screen it sits right of the
+            wordmark; on mobile the whole group drops to its own line and wraps
+            left-aligned, so every item — Sign out included — stays visible. */}
+        <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'clamp(14px, 4vw, 22px)' }}>
+          <button className={`nav-pill ${activeTab === 'bucket' ? 'active' : ''}`} onClick={() => onChangeTab('bucket')}>Bucket</button>
+          <button className={`nav-pill ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => onChangeTab('gallery')}>Gallery</button>
+          <button className={`nav-pill ${activeTab === 'milestones' ? 'active' : ''}`} onClick={() => onChangeTab('milestones')}>Timeline</button>
+          <button className={`nav-pill ${activeTab === 'us' ? 'active' : ''}`} onClick={() => onChangeTab('us')}>Us</button>
+          <button className="nav-pill" onClick={() => signOut()} title="Sign out" style={{ color: theme.muted }}>Sign&nbsp;out</button>
+        </nav>
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '16px', marginTop: '32px' }}>
         <h1 style={{ margin: 0, fontSize: 'clamp(28px, 8vw, 40px)', fontWeight: 400, lineHeight: 1.1, color: theme.ink, letterSpacing: '-0.01em' }}>
