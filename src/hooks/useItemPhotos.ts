@@ -4,7 +4,7 @@ import { uploadImage } from '../lib/cloudinary';
 import { resizeImage } from '../lib/resizeImage';
 import { cloudinaryPublicId } from '../lib/cloudinaryPublicId';
 import { groupPosts } from '../lib/groupPosts';
-import type { GalleryImage } from '../types';
+import type { GalleryImage, MediaType } from '../types';
 
 // Photos linked to ONE bucket item, grouped into carousel posts. Reuses the
 // gallery upload/delete pipeline (Cloudinary) but multiple images uploaded
@@ -13,6 +13,7 @@ interface GalleryRow {
   id: string;
   url: string;
   caption: string;
+  media_type: MediaType | null;
   post_id: string | null;
   position: number | null;
   created_at: string;
@@ -22,12 +23,13 @@ const mapRow = (row: GalleryRow): GalleryImage => ({
   id: row.id,
   url: row.url,
   caption: row.caption,
+  mediaType: row.media_type ?? 'image',
   postId: row.post_id ?? undefined,
   position: row.position ?? undefined,
   createdAt: row.created_at,
 });
 
-const SELECT = 'id, url, caption, post_id, position, created_at';
+const SELECT = 'id, url, caption, media_type, post_id, position, created_at';
 
 export function useItemPhotos(bucketItemId: string, onChanged?: () => void) {
   const [images, setImages] = useState<GalleryImage[]>([]);

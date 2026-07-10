@@ -78,7 +78,33 @@ CLOUDINARY_API_KEY      = your Cloudinary API key
 CLOUDINARY_API_SECRET   = your Cloudinary API secret   (server-only — never VITE_)
 ```
 
+The function handles both photos and videos — the app passes `resourceType`
+(`'image'` or `'video'`) so Cloudinary destroys the right asset. **Re-deploy it after
+pulling the video changes** (Edge Functions → `delete-image` → paste the updated
+`index.ts` → Deploy).
+
 ### 3. Test
 Open a photo → Remove → confirm. The row disappears and the asset is gone from
 your Cloudinary Media Library. If the secrets are missing you'll see "Photo
 removed, but its stored file could not be deleted." (the row still deletes).
+
+---
+
+# Video uploads — Cloudinary preset
+
+Photos and videos are uploaded unsigned from the browser using the preset named in
+`VITE_CLOUDINARY_UPLOAD_PRESET`. Two one-time settings on that preset (Cloudinary →
+**Settings → Upload → your preset**):
+
+1. **Allow video.** Under *Resource type*, use **Auto** (or explicitly allow video),
+   so `video/upload` requests are accepted — otherwise video uploads fail with a
+   "resource type not allowed" error.
+2. **Cap stored video size (recommended).** Add an **Incoming Transformation** on the
+   preset, e.g. `c_limit,w_1920,q_auto` (optionally `br_2m` to cap bitrate). This
+   transcodes on the way in so the *stored* file stays small — the app already
+   optimizes *delivery* (`q_auto`, width caps, poster frames) but only an incoming
+   transform reduces what Cloudinary stores.
+
+Client-side we also reject any single video over ~100MB (Cloudinary's unsigned limit)
+with a friendly message. Images are still downscaled in the browser before upload
+(`src/lib/resizeImage.ts`).

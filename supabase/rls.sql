@@ -9,10 +9,11 @@
 -- Run this once in the Supabase dashboard: SQL Editor → paste → Run.
 
 -- 1. Turn RLS on. Once enabled, every access is denied unless a policy allows it.
-alter table public.bucket_items   enable row level security;
-alter table public.gallery_images enable row level security;
-alter table public.app_settings   enable row level security;
-alter table public.milestones     enable row level security;
+alter table public.bucket_items    enable row level security;
+alter table public.gallery_images  enable row level security;
+alter table public.app_settings    enable row level security;
+alter table public.milestones      enable row level security;
+alter table public.milestone_media enable row level security;
 
 -- 2. Allow full read/write to any authenticated session.
 --    (Both partners share one hidden account, so "authenticated" == "unlocked".)
@@ -48,6 +49,15 @@ create policy "authenticated full access"
 drop policy if exists "authenticated full access" on public.milestones;
 create policy "authenticated full access"
   on public.milestones
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+-- milestone_media
+drop policy if exists "authenticated full access" on public.milestone_media;
+create policy "authenticated full access"
+  on public.milestone_media
   for all
   to authenticated
   using (true)

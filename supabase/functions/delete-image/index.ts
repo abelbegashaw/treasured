@@ -4,7 +4,8 @@
 //
 // Deletes an asset from Cloudinary. This MUST be server-side: destroying an
 // asset requires a signed request using the Cloudinary API secret, which can
-// never be shipped to the browser. The client sends only the public_id.
+// never be shipped to the browser. The client sends the public_id and, for
+// videos, resourceType: 'video' (defaults to 'image').
 //
 // Required secrets (set with `supabase secrets set ...`):
 //   CLOUDINARY_CLOUD_NAME
@@ -40,14 +41,17 @@ Deno.serve(async (req) => {
   }
 
   let publicId: unknown;
+  let resourceType: unknown;
   try {
-    ({ publicId } = await req.json());
+    ({ publicId, resourceType } = await req.json());
   } catch {
     return json({ error: 'Invalid request.' }, 400);
   }
   if (typeof publicId !== 'string' || !publicId) {
     return json({ error: 'Missing publicId.' }, 400);
   }
+  // Only 'image' and 'video' are valid Cloudinary resource types here.
+  const kind = resourceType === 'video' ? 'video' : 'image';
 
   // Cloudinary signature: sha1 of the sorted, signable params + api_secret.
   const timestamp = Math.floor(Date.now() / 1000);
@@ -59,7 +63,7 @@ Deno.serve(async (req) => {
   form.append('api_key', apiKey);
   form.append('signature', signature);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`, {
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${kind}/destroy`, {
     method: 'POST',
     body: form,
   });
