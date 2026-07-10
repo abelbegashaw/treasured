@@ -1,4 +1,4 @@
-import { galleryThumb } from '../../lib/cloudinaryUrl';
+import { mediaThumb } from '../../lib/cloudinaryUrl';
 import type { GalleryImage } from '../../types';
 
 interface GalleryGridProps {
@@ -20,10 +20,16 @@ export function GalleryGrid({ images, onOpen, skeletonCount = 0 }: GalleryGridPr
           aria-label={img.caption || 'Open photo'}
         >
           <img
-            src={galleryThumb(img.url)}
+            src={mediaThumb(img.url, img.mediaType)}
             alt={img.caption || 'Shared memory'}
             loading="lazy"
+            decoding="async"
           />
+          {img.mediaType === 'video' && (
+            <span className="gallery-tile-video" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4" /></svg>
+            </span>
+          )}
           {img.caption && <span className="gallery-tile-caption">{img.caption}</span>}
         </button>
       ))}

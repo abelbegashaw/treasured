@@ -20,10 +20,10 @@ export function AddImageForm({ imgFile, setImgFile, imgCaptionInput, setImgCapti
           className="pill-input"
           style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', flex: '1 1 200px', color: imgFile ? theme.ink : theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', borderRight: 'none' }}
         >
-          {imgFile ? imgFile.name : 'Choose an image…'}
+          {imgFile ? imgFile.name : 'Choose a photo or video…'}
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             onChange={(e) => setImgFile(e.target.files?.[0] ?? null)}
             style={{ display: 'none' }}
           />

@@ -264,6 +264,22 @@ export function GlobalStyles() {
         background: rgba(0, 0, 0, 0.55);
       }
 
+      /* Play badge centered on a video tile in the grid. */
+      .gallery-tile-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+      }
+
       /* Carousel position dots. */
       .carousel-dots {
         flex-shrink: 0;

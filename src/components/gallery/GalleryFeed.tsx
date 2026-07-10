@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTheme } from '../../context/ThemeContext';
-import { galleryFull } from '../../lib/cloudinaryUrl';
+import { galleryFull, videoPlayback, videoPoster } from '../../lib/cloudinaryUrl';
+import { AutoplayVideo } from '../media/AutoplayVideo';
 import type { GalleryImage } from '../../types';
 
 interface GalleryFeedProps {
@@ -79,17 +80,27 @@ export function GalleryFeed({ images, startIndex, onClose, onRemove }: GalleryFe
                 className="gallery-modal-post"
                 style={{ scrollMarginTop: '72px', margin: 0, width: '100%', maxWidth: '560px' }}
               >
-                {/* Image floats directly on the dark overlay — no card chrome. The
+                {/* Media floats directly on the dark overlay — no card chrome. The
                     reserved 4:5 box keeps layout stable before load so the jump
-                    lands accurately; contain shows the whole photo, never cropped,
-                    with the letterbox transparent so it blends into the backdrop. */}
-                <img
-                  src={galleryFull(img.url)}
-                  alt={img.caption || 'Shared memory'}
-                  // Tapped photo loads eagerly for an instant view; the rest lazy-load.
-                  loading={index === target ? 'eager' : 'lazy'}
-                  style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'contain', display: 'block', backgroundColor: 'transparent' }}
-                />
+                    lands accurately; contain shows the whole photo/video, never
+                    cropped, letterbox transparent so it blends into the backdrop.
+                    Videos autoplay muted only while this node is in view. */}
+                {img.mediaType === 'video' ? (
+                  <AutoplayVideo
+                    src={videoPlayback(img.url)}
+                    poster={videoPoster(img.url)}
+                    fit="contain"
+                    style={{ width: '100%', aspectRatio: '4 / 5', background: 'transparent' }}
+                  />
+                ) : (
+                  <img
+                    src={galleryFull(img.url)}
+                    alt={img.caption || 'Shared memory'}
+                    // Tapped photo loads eagerly for an instant view; the rest lazy-load.
+                    loading={index === target ? 'eager' : 'lazy'}
+                    style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'contain', display: 'block', backgroundColor: 'transparent' }}
+                  />
+                )}
                 <figcaption style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '16px', padding: '14px 2px 0', color: '#fff' }}>
                   <span style={{ minWidth: 0 }}>
                     {img.caption && (

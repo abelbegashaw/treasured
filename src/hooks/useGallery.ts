@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabase-client';
-import { uploadImage } from '../lib/cloudinary';
-import { resizeImage } from '../lib/resizeImage';
+import { uploadMedia } from '../lib/cloudinary';
 import { cloudinaryPublicId } from '../lib/cloudinaryPublicId';
-import type { GalleryImage } from '../types';
+import type { GalleryImage, MediaType } from '../types';
 
 // How many photos to fetch per page (multiple of 3 to fill whole grid rows).
 const PAGE_SIZE = 24;
@@ -13,6 +12,7 @@ interface GalleryRow {
   id: string;
   url: string;
   caption: string;
+  media_type: MediaType;
   created_at: string;
 }
 
@@ -20,6 +20,7 @@ const mapRow = (row: GalleryRow): GalleryImage => ({
   id: row.id,
   url: row.url,
   caption: row.caption,
+  mediaType: row.media_type ?? 'image',
   createdAt: row.created_at,
 });
 
@@ -106,15 +107,13 @@ export function useGallery() {
     setUploading(true);
     setError('');
     try {
-      // Downscale + re-encode before upload to save storage/bandwidth (no-op
-      // fallback to the original if it can't shrink it).
-      const optimized = await resizeImage(imgFile);
-      const url = await uploadImage(optimized);
+      // uploadMedia downscales images before upload and detects image vs video.
+      const { url, type } = await uploadMedia(imgFile);
       const caption = imgCaptionInput.trim() || 'Captured Moment';
 
       const { data, error: insertError } = await supabase
         .from('gallery_images')
-        .insert({ url, caption })
+        .insert({ url, caption, media_type: type })
         .select()
         .single();
 
@@ -150,7 +149,7 @@ export function useGallery() {
     const publicId = target ? cloudinaryPublicId(target.url) : null;
     if (publicId) {
       const { error: fnError } = await supabase.functions.invoke('delete-image', {
-        body: { publicId },
+        body: { publicId, resourceType: target?.mediaType ?? 'image' },
       });
       if (fnError) {
         setError('Photo removed, but its stored file could not be deleted.');
