@@ -1,32 +1,74 @@
 import { useTheme } from '../../context/ThemeContext';
+import { BrandMark } from '../layout/BrandMark';
 
-// SCREEN 3: STORIES SECTION (EDITORIAL ABOUT US DISPLAY)
+// SCREEN 4: "US" — an emotional, typographic introduction to Treasured.
+// Deliberately minimal: a centered editorial statement, mono base with refined
+// serif-italic accents on the phrases that carry the feeling. No cards, no
+// shadows, no stock imagery — just type and generous space.
 export function AboutUsPage() {
   const theme = useTheme();
 
   return (
     <section
-      className="reveal-up card-shadow"
-      style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '32px', alignItems: 'center', backgroundColor: theme.card, padding: '36px', borderRadius: '24px', border: `1px solid ${theme.line}` }}
+      className="reveal-up"
+      style={{
+        maxWidth: '600px',
+        margin: '0 auto',
+        padding: 'clamp(32px, 8vw, 72px) 4px',
+        textAlign: 'center',
+      }}
     >
-      <div>
-        <p style={{ margin: '0 0 10px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.25em', color: theme.muted }}>Our story</p>
-        <h2 style={{ fontSize: '28px', margin: '0 0 16px 0', color: theme.ink }}>Our shared space</h2>
-        <p style={{ fontSize: '15px', lineHeight: '1.7', color: theme.muted, margin: '0 0 24px 0' }}>
-          An intentional digital sanctuary designed entirely out of view from regular algorithmic feeds. Here, milestones remain permanent, photos retain their raw contextual meanings, and lists progress gracefully forward in real-time sync.
-        </p>
-        <div style={{ display: 'inline-block', borderTop: `1px solid ${theme.accent}`, paddingTop: '12px' }}>
-          <span style={{ fontSize: '11px', color: theme.muted, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Twin log engine // live ecosystem</span>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', color: theme.accent }}>
+        <BrandMark size={30} glint={theme.sun} />
       </div>
 
-      <div style={{ border: `1px solid ${theme.line}`, borderRadius: '16px', overflow: 'hidden', height: '280px', backgroundColor: theme.canvas }}>
-        <img
-          src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600"
-          alt="Minimal narrative artwork representational accent window"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      </div>
+      <p
+        style={{
+          margin: '22px 0 0',
+          fontSize: '12px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.32em',
+          color: theme.muted,
+        }}
+      >
+        Our story
+      </p>
+
+      <p
+        style={{
+          margin: 'clamp(20px, 5vw, 32px) auto 0',
+          maxWidth: '30ch',
+          fontSize: 'clamp(19px, 5.2vw, 27px)',
+          lineHeight: 1.5,
+          color: theme.ink,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        Treasured is where we keep{' '}
+        <span className="accent-serif" style={{ color: theme.accent, fontSize: '1.15em' }}>what matters</span>
+        {' '}— the moments, memories, milestones, and plans we never want to lose. A shared space for our
+        favorite photos,{' '}
+        <span className="accent-serif" style={{ color: theme.muted, fontSize: '1.15em' }}>our journey together</span>,
+        {' '}and all the little things that make{' '}
+        <span className="accent-serif" style={{ color: theme.accent, fontSize: '1.15em' }}>our story uniquely ours.</span>
+      </p>
+
+      <div
+        aria-hidden="true"
+        style={{ width: '40px', height: '1px', backgroundColor: theme.line, margin: 'clamp(28px, 6vw, 44px) auto 0' }}
+      />
+
+      <p
+        style={{
+          margin: '18px 0 0',
+          fontSize: '11px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.28em',
+          color: theme.muted,
+        }}
+      >
+        Est. 2026 · A shared keepsake
+      </p>
     </section>
   );
 }

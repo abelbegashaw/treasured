@@ -14,10 +14,13 @@ interface MilestoneTimelineProps {
 }
 
 // The left-rail single-column timeline: a hairline spine with a node per month
-// from the beginning up to now, oldest at the top.
+// from the beginning up to now. Newest at the top so it reads like a feed — the
+// most recent milestone (and any newly added month) surfaces first; BEGINNING
+// sits at the bottom.
 export function MilestoneTimeline({ anchorDate, milestonesByMonth, busyMonth, uploadProgress, onAdd, onRemove }: MilestoneTimelineProps) {
   const theme = useTheme();
-  const slots = useMemo(() => milestoneMonths(anchorDate), [anchorDate]);
+  // milestoneMonths() returns oldest→newest; reverse for newest-first display.
+  const slots = useMemo(() => milestoneMonths(anchorDate).slice().reverse(), [anchorDate]);
   const filledCount = milestonesByMonth.size;
 
   return (

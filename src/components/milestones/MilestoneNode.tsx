@@ -61,7 +61,7 @@ export function MilestoneNode({ slot, milestone, busy, disabled, uploadProgress,
             removeDisabled={disabled || busy}
           />
           {milestone?.note && (
-            <p style={{ margin: '10px 2px 0', fontSize: '14px', lineHeight: 1.5, color: theme.muted }}>{milestone.note}</p>
+            <p style={{ margin: '10px 2px 0', fontSize: '14px', lineHeight: 1.5, color: theme.muted, overflowWrap: 'anywhere' }}>{milestone.note}</p>
           )}
         </div>
       )}

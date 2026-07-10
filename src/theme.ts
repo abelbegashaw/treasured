@@ -1,4 +1,4 @@
-// --- MASTER UI PALETTE ARCHITECTURE (matches the original "List for Two" look) ---
+// --- MASTER UI PALETTE ARCHITECTURE (the warm, editorial "Treasured" look) ---
 export const theme = {
   canvas: '#f7f2e8',   // warm paper background
   ink: '#1f1a16',      // primary text

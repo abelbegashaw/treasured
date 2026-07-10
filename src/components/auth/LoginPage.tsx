@@ -3,6 +3,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { GlobalStyles } from '../../styles/GlobalStyles';
 import { AmbientBackground } from '../layout/AmbientBackground';
+import { BrandMark } from '../layout/BrandMark';
 
 // Auth gate: a single shared passcode, verified server-side, unlocks the app.
 export function LoginPage() {
@@ -34,7 +35,10 @@ export function LoginPage() {
       <AmbientBackground />
 
       <section className="reveal-up" style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '380px', backgroundColor: theme.card, border: `1px solid ${theme.ink}`, borderRadius: 0, padding: '36px 32px' }}>
-        <p style={{ margin: 0, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.32em', color: theme.muted }}>List&nbsp;/&nbsp;Two</p>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', color: theme.ink }}>
+          <BrandMark size={16} glint={theme.sun} />
+          <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.32em', color: theme.muted }}>Treasured</span>
+        </span>
         <h1 style={{ marginTop: '14px', marginBottom: '4px', fontSize: '28px', fontWeight: 400, color: theme.ink }}>Welcome back</h1>
         <p style={{ marginTop: 0, marginBottom: '26px', fontSize: '15px', color: theme.muted }}>Enter your shared passcode to continue.</p>
 

@@ -6,12 +6,27 @@ export function GlobalStyles() {
 
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap');
+
+      /* Predictable box model everywhere so padded/bordered blocks never
+         overflow their column on narrow screens. */
+      *, *::before, *::after { box-sizing: border-box; }
 
       h1, h2, h3, h4 {
         font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-weight: 400;
       }
+
+      /* Refined serif italic — scoped to accent phrases (e.g. the "Us" page).
+         Intentional second family paired with the mono base. */
+      .accent-serif {
+        font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      /* Media never forces horizontal overflow on small screens. */
+      img, video { max-width: 100%; }
 
       .paper-texture {
         position: absolute;
@@ -79,7 +94,7 @@ export function GlobalStyles() {
         border: none;
         border-bottom: 1px solid transparent;
         color: ${theme.muted};
-        padding: 6px 2px;
+        padding: 11px 2px;
         font-size: 12px;
         font-weight: 400;
         letter-spacing: 0.16em;

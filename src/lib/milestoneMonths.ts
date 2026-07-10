@@ -40,7 +40,8 @@ function labelFor(monthNumber: number): string {
   return monthNumber === 1 ? '1 MONTH' : `${monthNumber} MONTHS`;
 }
 
-// Oldest first (month 0 at the top), matching the timeline layout.
+// Ascending: month 0 (the beginning) first, current month last. The timeline
+// reverses this for its newest-first display.
 export function milestoneMonths(anchorIso: string, now: Date = new Date()): MonthSlot[] {
   const anchor = parseLocalDate(anchorIso);
   if (Number.isNaN(anchor.getTime())) return [];
