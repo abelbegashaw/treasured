@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { BrandMark } from './BrandMark';
@@ -8,10 +9,20 @@ interface HeaderProps {
   onChangeTab: (tab: Tab) => void;
 }
 
+// The masthead title + tagline are per-tab: the bucket list keeps its own
+// heading, and every other page gets one that fits its content.
+const HEADINGS: Record<Tab, { title: ReactNode; tagline: string }> = {
+  bucket: { title: <>Our shared<br />bucket list</>, tagline: 'Dream it together, do it together, remember it forever.' },
+  gallery: { title: <>Our photo<br />gallery</>, tagline: 'Every favorite moment, in one place.' },
+  milestones: { title: <>Our<br />timeline</>, tagline: 'Every milestone, the newest first.' },
+  us: { title: <>Our<br />story</>, tagline: 'Keep what matters, together.' },
+};
+
 // --- PRESERVED NAVIGATION HEADER ---
 export function Header({ activeTab, onChangeTab }: HeaderProps) {
   const theme = useTheme();
   const { signOut } = useAuth();
+  const heading = HEADINGS[activeTab];
 
   return (
     <header className="reveal-up" style={{ position: 'relative', zIndex: 10, maxWidth: '760px', margin: '0 auto', padding: '48px 24px 0' }}>
@@ -32,12 +43,12 @@ export function Header({ activeTab, onChangeTab }: HeaderProps) {
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '16px', marginTop: '32px' }}>
         <h1 style={{ margin: 0, fontSize: 'clamp(28px, 8vw, 40px)', fontWeight: 400, lineHeight: 1.1, color: theme.ink, letterSpacing: '-0.01em' }}>
-          Our shared<br />bucket list
+          {heading.title}
         </h1>
         <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.2em', color: theme.muted, paddingBottom: '6px' }}>Est. 2026</span>
       </div>
       <p style={{ marginTop: '14px', marginBottom: 0, fontSize: '15px', color: theme.muted }}>
-        Keep what matters, together.
+        {heading.tagline}
       </p>
     </header>
   );
