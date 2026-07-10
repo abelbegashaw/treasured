@@ -23,4 +23,14 @@ export interface PhotoPost {
   createdAt: string;   // newest image's timestamp
 }
 
-export type Tab = 'bucket' | 'gallery' | 'us';
+// A filled monthly-anniversary marker on the timeline. month_number counts whole
+// months from the "together since" anchor date (0 = the beginning, 1 = one month).
+export interface Milestone {
+  id: string;          // uuid
+  monthNumber: number;
+  url: string;
+  note: string;
+  createdAt: string;   // ISO timestamp
+}
+
+export type Tab = 'bucket' | 'gallery' | 'milestones' | 'us';

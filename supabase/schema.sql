@@ -25,3 +25,26 @@ create table if not exists public.gallery_images (
   position       smallint    not null default 0,
   created_at     timestamptz not null default now()
 );
+
+-- App settings: a single row (id is pinned to 1) holding shared config.
+-- anchor_date = the couple's "together since" date; the milestone timeline
+-- auto-numbers its monthly markers from this date. Read/written in
+-- src/hooks/useMilestones.ts.
+create table if not exists public.app_settings (
+  id          smallint    primary key default 1,
+  anchor_date date,
+  constraint app_settings_single_row check (id = 1)
+);
+insert into public.app_settings (id) values (1) on conflict do nothing;
+
+-- Milestones: one optional record per monthly-anniversary marker. month_number
+-- counts whole months from anchor_date (0 = the beginning, 1 = one month, …)
+-- and is unique so each month holds at most one photo + note. url points at the
+-- Cloudinary-hosted asset. Read/written in src/hooks/useMilestones.ts.
+create table if not exists public.milestones (
+  id           uuid        primary key default gen_random_uuid(),
+  month_number smallint    not null unique,
+  url          text        not null,
+  note         text        not null default '',
+  created_at   timestamptz not null default now()
+);

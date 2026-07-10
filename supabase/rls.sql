@@ -11,6 +11,8 @@
 -- 1. Turn RLS on. Once enabled, every access is denied unless a policy allows it.
 alter table public.bucket_items   enable row level security;
 alter table public.gallery_images enable row level security;
+alter table public.app_settings   enable row level security;
+alter table public.milestones     enable row level security;
 
 -- 2. Allow full read/write to any authenticated session.
 --    (Both partners share one hidden account, so "authenticated" == "unlocked".)
@@ -28,6 +30,24 @@ create policy "authenticated full access"
 drop policy if exists "authenticated full access" on public.gallery_images;
 create policy "authenticated full access"
   on public.gallery_images
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+-- app_settings
+drop policy if exists "authenticated full access" on public.app_settings;
+create policy "authenticated full access"
+  on public.app_settings
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+-- milestones
+drop policy if exists "authenticated full access" on public.milestones;
+create policy "authenticated full access"
+  on public.milestones
   for all
   to authenticated
   using (true)

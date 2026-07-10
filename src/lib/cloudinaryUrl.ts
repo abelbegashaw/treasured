@@ -25,3 +25,8 @@ export const galleryThumb = (url: string): string =>
 // Full post for the feed — fit within 1080px wide, aspect preserved.
 export const galleryFull = (url: string): string =>
   withTransform(url, 'f_auto,q_auto,c_limit,w_1080');
+
+// Milestone photo for the timeline — center-cropped to the same 4:5 portrait as
+// the gallery grid, sized for a single-column rail.
+export const milestonePhoto = (url: string): string =>
+  withTransform(url, 'f_auto,q_auto,c_fill,ar_4:5,w_800');

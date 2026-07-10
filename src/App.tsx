@@ -8,6 +8,7 @@ import { Header } from './components/layout/Header';
 import { LoginPage } from './components/auth/LoginPage';
 import { BucketListPage } from './components/bucket-list/BucketListPage';
 import { GalleryPage } from './components/gallery/GalleryPage';
+import { MilestonesPage } from './components/milestones/MilestonesPage';
 import { AboutUsPage } from './components/about/AboutUsPage';
 import type { Tab } from './types';
 
@@ -27,6 +28,7 @@ function AppShell() {
       <main style={{ position: 'relative', zIndex: 10, maxWidth: '760px', margin: '0 auto', padding: '32px 24px 64px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {activeTab === 'bucket' && <BucketListPage />}
         {activeTab === 'gallery' && <GalleryPage />}
+        {activeTab === 'milestones' && <MilestonesPage />}
         {activeTab === 'us' && <AboutUsPage />}
       </main>
     </div>

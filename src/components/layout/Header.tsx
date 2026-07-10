@@ -20,6 +20,7 @@ export function Header({ activeTab, onChangeTab }: HeaderProps) {
           <nav style={{ display: 'flex', gap: '22px' }}>
             <button className={`nav-pill ${activeTab === 'bucket' ? 'active' : ''}`} onClick={() => onChangeTab('bucket')}>Bucket</button>
             <button className={`nav-pill ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => onChangeTab('gallery')}>Gallery</button>
+            <button className={`nav-pill ${activeTab === 'milestones' ? 'active' : ''}`} onClick={() => onChangeTab('milestones')}>Timeline</button>
             <button className={`nav-pill ${activeTab === 'us' ? 'active' : ''}`} onClick={() => onChangeTab('us')}>Us</button>
           </nav>
           <button className="nav-pill" onClick={() => signOut()} title="Sign out">Sign&nbsp;out</button>
