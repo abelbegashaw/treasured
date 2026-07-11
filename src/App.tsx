@@ -18,38 +18,40 @@ function AppShell() {
   // --- COMPONENT VIEWS CONTROL STATE ---
   const [activeTab, setActiveTab] = useState<Tab>('bucket');
 
-  // The "Us" page is a single, non-scrolling screen: the shell locks to the
-  // viewport height and its content area fills the space under the header and
-  // centers. Every other tab keeps normal document scrolling.
+  // The "Us" page is a single, non-scrolling screen; every other tab scrolls
+  // inside the frame below. Because scrolling happens in an inner container (not
+  // the body), the top bar can be sticky and the ambient backdrop stays fixed.
   const isUs = activeTab === 'us';
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: isUs ? '100dvh' : '100vh', height: isUs ? '100dvh' : undefined, backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
+    <div style={{ position: 'relative', overflow: 'hidden', height: '100dvh', display: 'flex', flexDirection: 'column', backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
       <GlobalStyles />
       <AmbientBackground />
-      <Header activeTab={activeTab} onChangeTab={setActiveTab} />
 
-      {/* --- WORKSPACE LAYOUT PANELS --- */}
-      <main
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          width: '100%',
-          maxWidth: '760px',
-          margin: '0 auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          ...(isUs
-            ? { flex: '1 1 auto', minHeight: 0, justifyContent: 'center', overflow: 'hidden', padding: '8px 24px 24px' }
-            : { padding: '32px 24px 64px' }),
-        }}
-      >
-        {activeTab === 'bucket' && <BucketListPage />}
-        {activeTab === 'gallery' && <GalleryPage />}
-        {activeTab === 'milestones' && <MilestonesPage />}
-        {isUs && <AboutUsPage />}
-      </main>
+      {/* Scroll frame — the sticky top bar sticks to the top of THIS element. */}
+      <div style={{ position: 'relative', zIndex: 10, flex: '1 1 auto', minHeight: 0, overflowX: 'hidden', overflowY: isUs ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Header activeTab={activeTab} onChangeTab={setActiveTab} />
+
+        {/* --- WORKSPACE LAYOUT PANELS --- */}
+        <main
+          style={{
+            width: '100%',
+            maxWidth: '760px',
+            margin: '0 auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            ...(isUs
+              ? { flex: '1 1 auto', minHeight: 0, justifyContent: 'center', padding: '8px 24px 24px' }
+              : { padding: '28px 24px 72px' }),
+          }}
+        >
+          {activeTab === 'bucket' && <BucketListPage />}
+          {activeTab === 'gallery' && <GalleryPage />}
+          {activeTab === 'milestones' && <MilestonesPage />}
+          {isUs && <AboutUsPage />}
+        </main>
+      </div>
     </div>
   );
 }

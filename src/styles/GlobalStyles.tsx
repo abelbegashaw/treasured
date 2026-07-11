@@ -110,17 +110,14 @@ export function GlobalStyles() {
       }
       .tab-rail::-webkit-scrollbar { display: none; }
 
-      /* Underlined text tabs instead of filled pills. The -1px bottom margin
-         drops each tab's underline onto the rail so the active accent reads as
-         a true tab indicator. */
+      /* Underlined text tabs instead of filled pills. */
       .nav-pill {
         flex: 0 0 auto;
         background: transparent;
         border: none;
         border-bottom: 2px solid transparent;
-        margin-bottom: -1px;
         color: ${theme.muted};
-        padding: 12px 1px 11px;
+        padding: 9px 1px 8px;
         font-size: 12px;
         font-weight: 400;
         letter-spacing: 0.16em;

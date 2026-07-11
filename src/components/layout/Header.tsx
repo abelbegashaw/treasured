@@ -15,8 +15,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'us', label: 'Us' },
 ];
 
-// Compact per-tab masthead. Kept to a single line so the heading no longer eats
-// most of the first screen on mobile.
+// Compact per-tab masthead. Single line so it never eats the first screen. The
+// Us tab has no masthead — its own centered statement is the whole screen.
 const HEADINGS: Record<Tab, { title: string; tagline: string }> = {
   bucket: { title: 'Bucket list', tagline: 'Dream it, do it, remember it — together.' },
   gallery: { title: 'Gallery', tagline: 'Every favorite moment, in one place.' },
@@ -24,47 +24,61 @@ const HEADINGS: Record<Tab, { title: string; tagline: string }> = {
   us: { title: 'Our story', tagline: 'Keep what matters, together.' },
 };
 
-// --- TOP BAR + MASTHEAD ---
+// --- STICKY TOP BAR + MASTHEAD ---
 export function Header({ activeTab, onChangeTab }: HeaderProps) {
   const theme = useTheme();
   const { signOut } = useAuth();
   const heading = HEADINGS[activeTab];
 
   return (
-    <header className="reveal-up" style={{ position: 'relative', zIndex: 10, maxWidth: '760px', margin: '0 auto', padding: '24px 24px 0' }}>
-      {/* Top bar: wordmark on the left, a clearly-outlined Sign out on the right
-          so it never reads as just another nav tab. */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', color: theme.ink }}>
-          <BrandMark size={16} glint={theme.sun} />
-          <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.32em', color: theme.muted }}>Treasured</span>
-        </span>
-        <button className="nav-signout" onClick={() => signOut()} title="Sign out">Sign&nbsp;out</button>
+    <header>
+      {/* Frosted top bar — full-bleed, stays pinned while content scrolls under
+          it. Two tiers so nothing is cramped on a phone: wordmark + Sign out on
+          top, the section tabs on their own scrollable rail below. */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+          backgroundColor: 'rgba(247, 242, 232, 0.82)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: `1px solid ${theme.line}`,
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: '760px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '13px 0 9px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', color: theme.ink }}>
+              <BrandMark size={17} glint={theme.sun} />
+              <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.34em', color: theme.ink }}>Treasured</span>
+            </span>
+            <button className="nav-signout" onClick={() => signOut()} title="Sign out">Sign&nbsp;out</button>
+          </div>
+          <nav className="tab-rail">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                className={`nav-pill ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => onChangeTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
       </div>
 
-      {/* Section tabs sit on their own hairline rail — scrolls sideways rather
-          than wrapping into a tall block on narrow phones. */}
-      <nav className="tab-rail" style={{ borderBottom: `1px solid ${theme.line}`, marginTop: '16px' }}>
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={`nav-pill ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => onChangeTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-
-      {/* Compact masthead. */}
-      <div style={{ marginTop: '22px' }}>
-        <h1 style={{ margin: 0, fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 400, lineHeight: 1.1, color: theme.ink, letterSpacing: '-0.01em' }}>
-          {heading.title}
-        </h1>
-        <p style={{ margin: '8px 0 0', fontSize: '14px', color: theme.muted }}>
-          {heading.tagline}
-        </p>
-      </div>
+      {/* Per-tab masthead (skipped on Us). */}
+      {activeTab !== 'us' && (
+        <div style={{ width: '100%', maxWidth: '760px', margin: '0 auto', padding: '26px 24px 0' }}>
+          <h1 style={{ margin: 0, fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 400, lineHeight: 1.1, color: theme.ink, letterSpacing: '-0.01em' }}>
+            {heading.title}
+          </h1>
+          <p style={{ margin: '8px 0 0', fontSize: '14px', color: theme.muted }}>
+            {heading.tagline}
+          </p>
+        </div>
+      )}
     </header>
   );
 }

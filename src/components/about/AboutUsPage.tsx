@@ -55,7 +55,7 @@ export function AboutUsPage() {
           color: theme.muted,
         }}
       >
-        Est. 2026 · A shared keepsake
+        A shared keepsake
       </p>
     </section>
   );

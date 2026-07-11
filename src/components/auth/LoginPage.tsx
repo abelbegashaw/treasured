@@ -30,7 +30,7 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100dvh', backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <GlobalStyles />
       <AmbientBackground />
 
