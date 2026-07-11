@@ -40,10 +40,7 @@ export function Header({ activeTab, onChangeTab }: HeaderProps) {
           position: 'sticky',
           top: 0,
           zIndex: 20,
-          backgroundColor: 'rgba(247, 242, 232, 0.82)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: `1px solid ${theme.line}`,
+          backgroundColor: 'transparent',
         }}
       >
         <div style={{ width: '100%', maxWidth: '760px', margin: '0 auto', padding: '0 24px' }}>
