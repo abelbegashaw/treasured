@@ -6,7 +6,8 @@ export function GlobalStyles() {
 
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap');
+      /* Fonts are loaded via <link> in index.html so they fetch in parallel with
+         the bundle rather than after this style tag is injected at runtime. */
 
       /* Predictable box model everywhere so padded/bordered blocks never
          overflow their column on narrow screens. */
@@ -54,12 +55,21 @@ export function GlobalStyles() {
         inset: 0;
         pointer-events: none;
         background-image:
+          linear-gradient(to right, rgba(47, 38, 33, 0.035) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(47, 38, 33, 0.035) 1px, transparent 1px),
           linear-gradient(to right, rgba(47, 38, 33, 0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(47, 38, 33, 0.05) 1px, transparent 1px),
-          linear-gradient(to right, rgba(47, 38, 33, 0.08) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(47, 38, 33, 0.08) 1px, transparent 1px);
-        background-size: 26px 26px, 26px 26px, 130px 130px, 130px 130px;
+          linear-gradient(to bottom, rgba(47, 38, 33, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px, 32px 32px, 160px 160px, 160px 160px;
         mix-blend-mode: multiply;
+      }
+      /* On phones the grid competes with text for contrast — fade it well back
+         and grow the cells so it reads as faint paper, not a loud overlay. */
+      @media (max-width: 640px) {
+        .grid-paper {
+          opacity: 0.5;
+          background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px;
+        }
+        .paper-texture { opacity: 0.6; }
       }
 
       .float-orb {
@@ -88,17 +98,34 @@ export function GlobalStyles() {
         box-shadow: none;
       }
 
-      /* Underlined text tabs instead of filled pills. */
+      /* Section tabs live on a hairline rail that scrolls sideways rather than
+         wrapping into a tall stack on narrow phones. */
+      .tab-rail {
+        display: flex;
+        align-items: center;
+        gap: clamp(16px, 6vw, 28px);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tab-rail::-webkit-scrollbar { display: none; }
+
+      /* Underlined text tabs instead of filled pills. The -1px bottom margin
+         drops each tab's underline onto the rail so the active accent reads as
+         a true tab indicator. */
       .nav-pill {
+        flex: 0 0 auto;
         background: transparent;
         border: none;
-        border-bottom: 1px solid transparent;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
         color: ${theme.muted};
-        padding: 11px 2px;
+        padding: 12px 1px 11px;
         font-size: 12px;
         font-weight: 400;
         letter-spacing: 0.16em;
         text-transform: uppercase;
+        white-space: nowrap;
         cursor: pointer;
         border-radius: 0;
         transition: color 0.2s, border-color 0.2s;
@@ -111,6 +138,29 @@ export function GlobalStyles() {
       .nav-pill.active {
         color: ${theme.ink};
         border-bottom-color: ${theme.accent};
+      }
+
+      /* Sign out — deliberately NOT a tab: an outlined chip that turns rose on
+         hover so it's always distinguishable from navigation. */
+      .nav-signout {
+        flex: 0 0 auto;
+        border: 1px solid ${theme.line};
+        background: transparent;
+        color: ${theme.muted};
+        padding: 7px 14px;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-family: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s, background 0.2s;
+      }
+      .nav-signout:hover {
+        color: ${theme.rose};
+        border-color: ${theme.rose};
+        background: rgba(194, 75, 90, 0.06);
       }
 
       /* Square, hairline-bordered fields. */

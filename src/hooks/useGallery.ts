@@ -31,10 +31,8 @@ export function useGallery() {
   const [hasMore, setHasMore] = useState(true);         // more pages remain
   const [pageError, setPageError] = useState('');       // load / load-more failure
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState('');               // upload / remove failure
-
-  const [imgFile, setImgFile] = useState<File | null>(null);
-  const [imgCaptionInput, setImgCaptionInput] = useState('');
 
   // Refs let loadMore() stay stable (empty deps) while reading fresh state,
   // and guard against overlapping fetches (rapid scroll / observer re-fires).
@@ -101,31 +99,38 @@ export function useGallery() {
     loadInitial();
   }, [loadInitial]);
 
-  // Upload the picked file to Cloudinary, then persist the URL + caption to Supabase.
-  const addGalleryImage = async () => {
-    if (!imgFile || uploading) return;
+  // Upload one or many picked files to Cloudinary, then persist each as its own
+  // gallery entry. Files go up one at a time so progress is meaningful and a
+  // failure partway through still keeps everything already uploaded.
+  const addGalleryImages = async (files: File[], caption: string) => {
+    if (!files.length || uploading) return;
     setUploading(true);
+    setUploadProgress({ done: 0, total: files.length });
     setError('');
+    const finalCaption = caption.trim() || 'Captured Moment';
+
     try {
-      // uploadMedia downscales images before upload and detects image vs video.
-      const { url, type } = await uploadMedia(imgFile);
-      const caption = imgCaptionInput.trim() || 'Captured Moment';
+      for (let i = 0; i < files.length; i++) {
+        // uploadMedia downscales images before upload and detects image vs video.
+        const { url, type } = await uploadMedia(files[i]);
 
-      const { data, error: insertError } = await supabase
-        .from('gallery_images')
-        .insert({ url, caption, media_type: type })
-        .select()
-        .single();
+        const { data, error: insertError } = await supabase
+          .from('gallery_images')
+          .insert({ url, caption: finalCaption, media_type: type })
+          .select()
+          .single();
 
-      if (insertError) throw new Error(insertError.message);
+        if (insertError) throw new Error(insertError.message);
 
-      setGallery((prev) => [mapRow(data as GalleryRow), ...prev]);
-      setImgFile(null);
-      setImgCaptionInput('');
+        // Prepend so the newest upload sits first, matching the feed order.
+        setGallery((prev) => [mapRow(data as GalleryRow), ...prev]);
+        setUploadProgress({ done: i + 1, total: files.length });
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not add image.');
+      setError(err instanceof Error ? err.message : 'Could not add photos.');
     } finally {
       setUploading(false);
+      setUploadProgress({ done: 0, total: 0 });
     }
   };
 
@@ -164,12 +169,9 @@ export function useGallery() {
     hasMore,
     pageError,
     uploading,
+    uploadProgress,
     error,
-    imgFile,
-    setImgFile,
-    imgCaptionInput,
-    setImgCaptionInput,
-    addGalleryImage,
+    addGalleryImages,
     removeGalleryImage,
     loadMore,
     reload: loadInitial,

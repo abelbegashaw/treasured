@@ -33,17 +33,20 @@ export function MilestoneNode({ slot, milestone, busy, disabled, uploadProgress,
 
   return (
     <div style={{ position: 'relative', paddingBottom: '40px' }}>
-      {/* Node dot on the rail. Solid accent when the month has media, else hollow. */}
+      {/* Node dot on the rail. Solid accent when the month has media, else a
+          clear hollow ring. The canvas halo lets the dot sit cleanly on top of
+          the spine instead of the line cutting through it. */}
       <span
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: '-28px',
-          top: '3px',
-          width: '9px',
-          height: '9px',
+          top: '4px',
+          width: '10px',
+          height: '10px',
           backgroundColor: hasMedia ? theme.accent : theme.canvas,
-          border: hasMedia ? 'none' : `1px solid ${theme.line}`,
+          border: hasMedia ? `2px solid ${theme.accent}` : `2px solid ${theme.muted}`,
+          boxShadow: `0 0 0 3px ${theme.canvas}`,
         }}
       />
 

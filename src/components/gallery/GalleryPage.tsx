@@ -15,12 +15,9 @@ export function GalleryPage() {
     hasMore,
     pageError,
     uploading,
+    uploadProgress,
     error,
-    imgFile,
-    setImgFile,
-    imgCaptionInput,
-    setImgCaptionInput,
-    addGalleryImage,
+    addGalleryImages,
     removeGalleryImage,
     loadMore,
     reload,
@@ -50,12 +47,9 @@ export function GalleryPage() {
   return (
     <div className="reveal-up" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <AddImageForm
-        imgFile={imgFile}
-        setImgFile={setImgFile}
-        imgCaptionInput={imgCaptionInput}
-        setImgCaptionInput={setImgCaptionInput}
         uploading={uploading}
-        onSubmit={addGalleryImage}
+        progress={uploadProgress}
+        onSubmit={addGalleryImages}
       />
 
       {error && (

@@ -37,7 +37,7 @@ export function MilestoneTimeline({ anchorDate, milestonesByMonth, busyMonth, up
       <div style={{ position: 'relative', paddingLeft: '28px', marginTop: '28px' }}>
         <div
           aria-hidden="true"
-          style={{ position: 'absolute', left: '4px', top: '4px', bottom: '4px', width: '1px', backgroundColor: theme.line }}
+          style={{ position: 'absolute', left: '4px', top: '5px', bottom: '5px', width: '2px', backgroundColor: theme.muted, opacity: 0.85 }}
         />
         {slots.map((slot) => (
           <MilestoneNode
