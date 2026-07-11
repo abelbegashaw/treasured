@@ -14,7 +14,7 @@ export function AboutUsPage() {
       style={{
         maxWidth: '600px',
         margin: '0 auto',
-        padding: 'clamp(32px, 8vw, 72px) 4px',
+        padding: 'clamp(8px, 3vw, 20px) 4px',
         textAlign: 'center',
       }}
     >
@@ -24,21 +24,9 @@ export function AboutUsPage() {
 
       <p
         style={{
-          margin: '22px 0 0',
-          fontSize: '12px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.32em',
-          color: theme.muted,
-        }}
-      >
-        Our story
-      </p>
-
-      <p
-        style={{
-          margin: 'clamp(20px, 5vw, 32px) auto 0',
+          margin: 'clamp(14px, 4vw, 22px) auto 0',
           maxWidth: '30ch',
-          fontSize: 'clamp(19px, 5.2vw, 27px)',
+          fontSize: 'clamp(18px, 4.6vw, 25px)',
           lineHeight: 1.5,
           color: theme.ink,
           letterSpacing: '-0.01em',
@@ -55,12 +43,12 @@ export function AboutUsPage() {
 
       <div
         aria-hidden="true"
-        style={{ width: '40px', height: '1px', backgroundColor: theme.line, margin: 'clamp(28px, 6vw, 44px) auto 0' }}
+        style={{ width: '40px', height: '1px', backgroundColor: theme.line, margin: 'clamp(20px, 4vw, 32px) auto 0' }}
       />
 
       <p
         style={{
-          margin: '18px 0 0',
+          margin: '16px 0 0',
           fontSize: '11px',
           textTransform: 'uppercase',
           letterSpacing: '0.28em',

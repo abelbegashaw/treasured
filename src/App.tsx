@@ -18,18 +18,37 @@ function AppShell() {
   // --- COMPONENT VIEWS CONTROL STATE ---
   const [activeTab, setActiveTab] = useState<Tab>('bucket');
 
+  // The "Us" page is a single, non-scrolling screen: the shell locks to the
+  // viewport height and its content area fills the space under the header and
+  // centers. Every other tab keeps normal document scrolling.
+  const isUs = activeTab === 'us';
+
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
+    <div style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: isUs ? '100dvh' : '100vh', height: isUs ? '100dvh' : undefined, backgroundColor: theme.canvas, color: theme.ink, fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
       <GlobalStyles />
       <AmbientBackground />
       <Header activeTab={activeTab} onChangeTab={setActiveTab} />
 
       {/* --- WORKSPACE LAYOUT PANELS --- */}
-      <main style={{ position: 'relative', zIndex: 10, maxWidth: '760px', margin: '0 auto', padding: '32px 24px 64px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <main
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '760px',
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          ...(isUs
+            ? { flex: '1 1 auto', minHeight: 0, justifyContent: 'center', overflow: 'hidden', padding: '8px 24px 24px' }
+            : { padding: '32px 24px 64px' }),
+        }}
+      >
         {activeTab === 'bucket' && <BucketListPage />}
         {activeTab === 'gallery' && <GalleryPage />}
         {activeTab === 'milestones' && <MilestonesPage />}
-        {activeTab === 'us' && <AboutUsPage />}
+        {isUs && <AboutUsPage />}
       </main>
     </div>
   );
