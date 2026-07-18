@@ -7,10 +7,6 @@ interface AddImageFormProps {
   onSubmit: (files: File[], caption: string) => void;
 }
 
-// Generous ceiling — enough to add a whole outing at once without letting the
-// object-URL previews grow unbounded.
-const MAX_FILES = 30;
-
 interface Picked {
   file: File;
   url: string;   // object URL for preview
@@ -18,8 +14,9 @@ interface Picked {
   key: string;
 }
 
-// Gallery upload: pick MANY photos and/or videos in one go, preview them,
-// optionally drop a caption, then publish. Object URLs are revoked on cleanup.
+// Gallery upload: pick as MANY photos and/or videos as you like in one go,
+// preview them, optionally drop a caption, then publish. Object URLs are
+// revoked on cleanup.
 export function AddImageForm({ uploading, progress, onSubmit }: AddImageFormProps) {
   const theme = useTheme();
   const [picked, setPicked] = useState<Picked[]>([]);
@@ -35,10 +32,8 @@ export function AddImageForm({ uploading, progress, onSubmit }: AddImageFormProp
   const addFiles = (files: FileList | null) => {
     if (!files) return;
     setPicked((prev) => {
-      const room = MAX_FILES - prev.length;
       const next = Array.from(files)
         .filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
-        .slice(0, Math.max(0, room))
         .map((file) => ({
           file,
           url: URL.createObjectURL(file),
@@ -65,8 +60,6 @@ export function AddImageForm({ uploading, progress, onSubmit }: AddImageFormProp
     setCaption('');
   };
 
-  const atMax = picked.length >= MAX_FILES;
-
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {/* Thumbnails of everything queued. */}
@@ -78,7 +71,7 @@ export function AddImageForm({ uploading, progress, onSubmit }: AddImageFormProp
               style={{ position: 'relative', width: '76px', height: '76px', border: `1px solid ${theme.line}`, background: theme.line }}
             >
               {p.isVideo ? (
-                <video src={p.url} muted style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <video src={p.url} muted preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : (
                 <img src={p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               )}
@@ -102,14 +95,13 @@ export function AddImageForm({ uploading, progress, onSubmit }: AddImageFormProp
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0' }}>
         <label
           className="pill-input"
-          style={{ display: 'flex', alignItems: 'center', cursor: atMax ? 'default' : 'pointer', flex: '1 1 200px', color: theme.muted, opacity: atMax ? 0.5 : 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', borderRight: 'none' }}
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', flex: '1 1 200px', color: theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', borderRight: 'none' }}
         >
-          {atMax ? `Maximum ${MAX_FILES} files` : picked.length ? 'Add more photos or videos…' : 'Choose photos or videos…'}
+          {picked.length ? 'Add more photos or videos…' : 'Choose photos or videos…'}
           <input
             type="file"
             accept="image/*,video/*"
             multiple
-            disabled={atMax}
             onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }}
             style={{ display: 'none' }}
           />

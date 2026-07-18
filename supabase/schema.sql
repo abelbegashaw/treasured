@@ -14,7 +14,7 @@ create table if not exists public.bucket_items (
 -- Gallery images (url points at the Cloudinary-hosted asset)
 -- bucket_item_id optionally links a photo to a bucket item ("proof" of completion);
 -- null = a standalone Gallery photo. Linked photos still appear in the main Gallery.
--- post_id groups images uploaded together into one carousel post (2–10 images);
+-- post_id groups media uploaded together into one carousel post (2+ items);
 -- position orders them within the post. Both null/0 for standalone single photos.
 -- media_type distinguishes photos from videos ('image' | 'video').
 create table if not exists public.gallery_images (

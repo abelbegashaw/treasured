@@ -52,14 +52,6 @@ async function postToCloudinary(file: File, kind: MediaKind): Promise<string> {
 }
 
 /**
- * Uploads an image file to Cloudinary and returns its hosted secure URL.
- * (Callers that already downscale — e.g. bucket-item photos — use this directly.)
- */
-export async function uploadImage(file: File): Promise<string> {
-  return postToCloudinary(file, 'image');
-}
-
-/**
  * Uploads an image OR a video and reports which it was. Images are downscaled
  * client-side first (resizeImage); videos are size-guarded here and optimized on
  * delivery via cloudinaryUrl.ts. Throws a friendly error on config/size failure.

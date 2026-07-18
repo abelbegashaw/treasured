@@ -7,16 +7,16 @@ interface MultiImageUploadProps {
   onPost: (files: File[], caption: string) => void;
 }
 
-const MAX_IMAGES = 10;
-
 interface Picked {
   file: File;
   url: string; // object URL for preview
+  isVideo: boolean;
   key: string;
 }
 
-// Compose a carousel post: pick up to 10 images, drag to reorder, add a caption,
-// then post. Object URLs are revoked on cleanup to avoid leaks.
+// Compose a carousel post: pick any number of photos and/or videos, drag to
+// reorder, add a caption, then post. Object URLs are revoked on cleanup to
+// avoid leaks.
 export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUploadProps) {
   const theme = useTheme();
   const [picked, setPicked] = useState<Picked[]>([]);
@@ -33,11 +33,14 @@ export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUplo
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
-    const room = MAX_IMAGES - picked.length;
     const next = Array.from(files)
-      .filter((f) => f.type.startsWith('image/'))
-      .slice(0, Math.max(0, room))
-      .map((file) => ({ file, url: URL.createObjectURL(file), key: `p${seq.current++}` }));
+      .filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
+      .map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isVideo: file.type.startsWith('video/'),
+        key: `p${seq.current++}`,
+      }));
     setPicked((prev) => [...prev, ...next]);
   };
 
@@ -67,8 +70,6 @@ export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUplo
     setCaption('');
   };
 
-  const atMax = picked.length >= MAX_IMAGES;
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {/* Previews (drag to reorder) */}
@@ -96,8 +97,14 @@ export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUplo
                 background: theme.line,
               }}
             >
-              <img src={p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
-              <span style={{ position: 'absolute', bottom: 0, left: 0, padding: '1px 5px', fontSize: '10px', color: '#fff', background: 'rgba(0,0,0,0.55)' }}>{index + 1}</span>
+              {p.isVideo ? (
+                <video src={p.url} muted preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+              ) : (
+                <img src={p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+              )}
+              <span style={{ position: 'absolute', bottom: 0, left: 0, padding: '1px 5px', fontSize: '10px', color: '#fff', background: 'rgba(0,0,0,0.55)' }}>
+                {index + 1}{p.isVideo ? ' · video' : ''}
+              </span>
               <button
                 type="button"
                 onClick={() => removeAt(index)}
@@ -114,14 +121,13 @@ export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUplo
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0' }}>
         <label
           className="pill-input"
-          style={{ display: 'flex', alignItems: 'center', cursor: atMax ? 'default' : 'pointer', flex: '1 1 200px', color: theme.muted, opacity: atMax ? 0.5 : 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', borderRight: 'none' }}
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', flex: '1 1 200px', color: theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', borderRight: 'none' }}
         >
-          {atMax ? 'Maximum 10 images' : picked.length ? 'Add more images…' : 'Choose images…'}
+          {picked.length ? 'Add more photos or videos…' : 'Choose photos or videos…'}
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             multiple
-            disabled={atMax}
             onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }}
             style={{ display: 'none' }}
           />
@@ -144,7 +150,7 @@ export function MultiImageUpload({ uploading, progress, onPost }: MultiImageUplo
       >
         {uploading
           ? `Uploading ${progress.done}/${progress.total}…`
-          : picked.length > 1 ? `Post ${picked.length} photos` : 'Post'}
+          : picked.length > 1 ? `Post ${picked.length} items` : 'Post'}
       </button>
     </div>
   );

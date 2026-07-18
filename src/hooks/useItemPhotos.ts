@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../supabase-client';
-import { uploadImage } from '../lib/cloudinary';
-import { resizeImage } from '../lib/resizeImage';
+import { uploadMedia } from '../lib/cloudinary';
 import { cloudinaryPublicId } from '../lib/cloudinaryPublicId';
 import { groupPosts } from '../lib/groupPosts';
 import type { GalleryImage, MediaType } from '../types';
 
-// Photos linked to ONE bucket item, grouped into carousel posts. Reuses the
-// gallery upload/delete pipeline (Cloudinary) but multiple images uploaded
+// Photos/videos linked to ONE bucket item, grouped into carousel posts. Reuses
+// the gallery upload/delete pipeline (Cloudinary) but multiple media uploaded
 // together share a post_id + ordered position.
 interface GalleryRow {
   id: string;
@@ -72,16 +71,17 @@ export function useItemPhotos(bucketItemId: string, onChanged?: () => void) {
       const finalCaption = caption.trim() || 'Captured Moment';
 
       // Upload sequentially so progress is meaningful and we don't hammer Cloudinary.
-      const urls: string[] = [];
+      // uploadMedia downscales images before upload and detects image vs video.
+      const uploaded: { url: string; type: MediaType }[] = [];
       for (let i = 0; i < files.length; i++) {
-        const optimized = await resizeImage(files[i]);
-        urls.push(await uploadImage(optimized));
+        uploaded.push(await uploadMedia(files[i]));
         setUploadProgress({ done: i + 1, total: files.length });
       }
 
-      const rows = urls.map((url, index) => ({
-        url,
+      const rows = uploaded.map((u, index) => ({
+        url: u.url,
         caption: finalCaption,
+        media_type: u.type,
         bucket_item_id: bucketItemId,
         post_id: postId,
         position: index,
@@ -121,13 +121,13 @@ export function useItemPhotos(bucketItemId: string, onChanged?: () => void) {
     }
     onChanged?.();
 
-    // Best-effort Cloudinary cleanup for each image (rows are source of truth).
+    // Best-effort Cloudinary cleanup for each media item (rows are source of truth).
     let anyFailed = false;
     for (const t of targets) {
       const publicId = cloudinaryPublicId(t.url);
       if (!publicId) continue;
       const { error: fnError } = await supabase.functions.invoke('delete-image', {
-        body: { publicId },
+        body: { publicId, resourceType: t.mediaType },
       });
       if (fnError) anyFailed = true;
     }

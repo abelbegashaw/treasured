@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useItemPhotos } from '../../hooks/useItemPhotos';
 import { MultiImageUpload } from '../gallery/MultiImageUpload';
 import { PostCarousel } from '../gallery/PostCarousel';
-import { galleryThumb } from '../../lib/cloudinaryUrl';
+import { MediaThumb } from '../media/MediaThumb';
 import type { BucketItem } from '../../types';
 
 interface ItemPhotosModalProps {
@@ -57,7 +57,7 @@ export function ItemPhotosModal({ item, onClose, onChanged }: ItemPhotosModalPro
       >
         <h2 style={{ margin: '0 0 4px 0', fontSize: '20px', fontWeight: 400, color: theme.ink }}>{item.title}</h2>
         <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: theme.muted }}>
-          {totalImages} {totalImages === 1 ? 'photo' : 'photos'} — add proof you did it.
+          {totalImages} {totalImages === 1 ? 'item' : 'items'} — add proof you did it.
         </p>
 
         <MultiImageUpload uploading={uploading} progress={uploadProgress} onPost={addPost} />
@@ -70,7 +70,7 @@ export function ItemPhotosModal({ item, onClose, onChanged }: ItemPhotosModalPro
               {[0, 1, 2].map((i) => <div key={i} className="gallery-skeleton" aria-hidden="true" />)}
             </div>
           ) : posts.length === 0 ? (
-            <p style={{ margin: 0, fontSize: '14px', color: theme.muted }}>No photos yet — add the first one above.</p>
+            <p style={{ margin: 0, fontSize: '14px', color: theme.muted }}>No photos or videos yet — add the first one above.</p>
           ) : (
             <div className="gallery-grid">
               {posts.map((post) => (
@@ -80,7 +80,12 @@ export function ItemPhotosModal({ item, onClose, onChanged }: ItemPhotosModalPro
                   onClick={() => setOpenPostId(post.postId)}
                   aria-label={post.caption || 'Open post'}
                 >
-                  <img src={galleryThumb(post.images[0].url)} alt={post.caption || 'Shared memory'} loading="lazy" />
+                  <MediaThumb
+                    url={post.images[0].url}
+                    type={post.images[0].mediaType}
+                    alt={post.caption || 'Shared memory'}
+                    style={{ width: '100%', height: '100%' }}
+                  />
                   {post.images.length > 1 && (
                     <span className="carousel-badge" aria-hidden="true">
                       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

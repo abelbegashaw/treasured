@@ -11,8 +11,6 @@ interface MediaComposerProps {
   onCancel: () => void;
 }
 
-const MAX_MEDIA = 10;
-
 interface PickedFile {
   file: File;
   url: string; // object URL for preview
@@ -20,8 +18,8 @@ interface PickedFile {
   isVideo: boolean;
 }
 
-// Compose a milestone's media: pick up to 10 images/videos to upload (drag to
-// reorder), and/or reuse existing gallery media, plus an optional note.
+// Compose a milestone's media: pick any number of images/videos to upload (drag
+// to reorder), and/or reuse existing gallery media, plus an optional note.
 export function MediaComposer({ uploading, progress, onPost, onCancel }: MediaComposerProps) {
   const theme = useTheme();
   const [files, setFiles] = useState<PickedFile[]>([]);
@@ -39,14 +37,11 @@ export function MediaComposer({ uploading, progress, onPost, onCancel }: MediaCo
   }, []);
 
   const total = files.length + picks.length;
-  const atMax = total >= MAX_MEDIA;
 
   const addFiles = (list: FileList | null) => {
     if (!list) return;
-    const room = MAX_MEDIA - total;
     const next = Array.from(list)
       .filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
-      .slice(0, Math.max(0, room))
       .map((file) => ({ file, url: URL.createObjectURL(file), key: `f${seq.current++}`, isVideo: file.type.startsWith('video/') }));
     setFiles((prev) => [...prev, ...next]);
   };
@@ -72,8 +67,7 @@ export function MediaComposer({ uploading, progress, onPost, onCancel }: MediaCo
   const addPicks = (chosen: GalleryImage[]) => {
     setPicks((prev) => {
       const seen = new Set(prev.map((p) => p.id));
-      const room = MAX_MEDIA - (files.length + prev.length);
-      return [...prev, ...chosen.filter((c) => !seen.has(c.id)).slice(0, Math.max(0, room))];
+      return [...prev, ...chosen.filter((c) => !seen.has(c.id))];
     });
   };
 
@@ -133,17 +127,16 @@ export function MediaComposer({ uploading, progress, onPost, onCancel }: MediaCo
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
         <label
           className="pill-input"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: atMax ? 'default' : 'pointer', flex: '1 1 140px', color: theme.muted, opacity: atMax ? 0.5 : 1, whiteSpace: 'nowrap' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flex: '1 1 140px', color: theme.muted, whiteSpace: 'nowrap' }}
         >
-          {atMax ? 'Max 10' : 'Upload photo / video'}
-          <input type="file" accept="image/*,video/*" multiple disabled={atMax} onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
+          Upload photo / video
+          <input type="file" accept="image/*,video/*" multiple onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
         </label>
         <button
           type="button"
           onClick={() => setPickerOpen(true)}
-          disabled={atMax}
           className="pill-btn"
-          style={{ flex: '1 1 140px', border: `1px solid ${theme.line}`, background: 'transparent', color: theme.ink, opacity: atMax ? 0.5 : 1, cursor: atMax ? 'default' : 'pointer' }}
+          style={{ flex: '1 1 140px', border: `1px solid ${theme.line}`, background: 'transparent', color: theme.ink, cursor: 'pointer' }}
         >
           Choose from gallery
         </button>

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTheme } from '../../context/ThemeContext';
-import { galleryFull } from '../../lib/cloudinaryUrl';
+import { galleryFull, videoPlayback, videoPoster } from '../../lib/cloudinaryUrl';
+import { AutoplayVideo } from '../media/AutoplayVideo';
 import type { PhotoPost } from '../../types';
 
 interface PostCarouselProps {
@@ -11,7 +12,8 @@ interface PostCarouselProps {
 }
 
 // Full-screen swipeable carousel for one post. Horizontal scroll-snap track with
-// position dots; images shown whole (contain). Delete removes the whole post.
+// position dots; media shown whole (contain) — videos play with native controls,
+// only on the snapped slide. Delete removes the whole post.
 export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
   const theme = useTheme();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -61,13 +63,24 @@ export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
         onClick={(e) => e.stopPropagation()}
         style={{ flex: 1, minHeight: 0, display: 'flex', overflowX: 'auto', overflowY: 'hidden', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
       >
-        {post.images.map((img) => (
+        {post.images.map((img, i) => (
           <div key={img.id} style={{ flex: '0 0 100%', width: '100%', height: '100%', scrollSnapAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}>
-            <img
-              src={galleryFull(img.url)}
-              alt={post.caption || 'Shared memory'}
-              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
-            />
+            {img.mediaType === 'video' ? (
+              <AutoplayVideo
+                src={videoPlayback(img.url)}
+                poster={videoPoster(img.url)}
+                active={i === active}
+                controls
+                fit="contain"
+                style={{ width: '100%', height: '100%', background: 'transparent' }}
+              />
+            ) : (
+              <img
+                src={galleryFull(img.url)}
+                alt={post.caption || 'Shared memory'}
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -108,7 +121,7 @@ export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
             style={{ width: '100%', maxWidth: '330px', backgroundColor: theme.card, border: `1px solid ${theme.ink}`, padding: '24px' }}
           >
             <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 400, color: theme.ink }}>
-              Delete {multi ? `all ${post.images.length} photos` : 'this photo'}?
+              Delete {multi ? `all ${post.images.length} items` : 'this item'}?
             </h3>
             <p style={{ margin: '0 0 20px 0', fontSize: '14px', lineHeight: 1.5, color: theme.muted }}>
               This permanently removes {multi ? 'the whole post' : 'it'} from your gallery and storage. This can’t be undone.
