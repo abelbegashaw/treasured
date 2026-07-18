@@ -104,6 +104,56 @@ export function useItemPhotos(bucketItemId: string, onChanged?: () => void) {
     }
   };
 
+  // Append more files to an EXISTING post, preserving its post_id and ordering
+  // new items after the current last position.
+  const appendToPost = async (postId: string, files: File[]) => {
+    if (!files.length || uploading) return;
+    setUploading(true);
+    setUploadProgress({ done: 0, total: files.length });
+    setError('');
+    try {
+      // Find the highest existing position for this post.
+      const existing = images.filter((img) => (img.postId ?? `single:${img.id}`) === postId);
+      const nextPosition = existing.length
+        ? Math.max(...existing.map((img) => img.position ?? 0)) + 1
+        : 0;
+
+      // Use the same caption as the post.
+      const caption = existing[0]?.caption ?? 'Captured Moment';
+
+      const uploaded: { url: string; type: MediaType }[] = [];
+      for (let i = 0; i < files.length; i++) {
+        uploaded.push(await uploadMedia(files[i]));
+        setUploadProgress({ done: i + 1, total: files.length });
+      }
+
+      const rows = uploaded.map((u, index) => ({
+        url: u.url,
+        caption,
+        media_type: u.type,
+        bucket_item_id: bucketItemId,
+        post_id: postId,
+        position: nextPosition + index,
+      }));
+
+      const { data, error: insertError } = await supabase
+        .from('gallery_images')
+        .insert(rows)
+        .select(SELECT);
+
+      if (insertError) throw new Error(insertError.message);
+
+      // Merge the new images into state; groupPosts will keep them in position order.
+      setImages((prev) => [...prev, ...(data as GalleryRow[]).map(mapRow)]);
+      onChanged?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not add to post.');
+    } finally {
+      setUploading(false);
+      setUploadProgress({ done: 0, total: 0 });
+    }
+  };
+
   // Delete a whole post (all its images + their Cloudinary assets).
   const removePost = async (postId: string) => {
     const targets = images.filter((img) => (img.postId ?? `single:${img.id}`) === postId);
@@ -141,6 +191,7 @@ export function useItemPhotos(bucketItemId: string, onChanged?: () => void) {
     uploadProgress,
     error,
     addPost,
+    appendToPost,
     removePost,
   };
 }

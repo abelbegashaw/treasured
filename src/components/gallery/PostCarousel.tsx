@@ -7,14 +7,17 @@ import type { PhotoPost } from '../../types';
 
 interface PostCarouselProps {
   post: PhotoPost;
+  uploading?: boolean;
+  uploadProgress?: { done: number; total: number };
   onClose: () => void;
   onDelete: (postId: string) => void;
+  onAppend?: (postId: string, files: File[]) => void;
 }
 
 // Full-screen swipeable carousel for one post. Horizontal scroll-snap track with
 // position dots; media shown whole (contain) — videos play with native controls,
-// only on the snapped slide. Delete removes the whole post.
-export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
+// only on the snapped slide. Delete removes the whole post; Add more appends to it.
+export function PostCarousel({ post, uploading, uploadProgress, onClose, onDelete, onAppend }: PostCarouselProps) {
   const theme = useTheme();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -94,7 +97,7 @@ export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
         </div>
       )}
 
-      {/* Footer: caption + delete */}
+      {/* Footer: caption + add more + delete */}
       <div onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '14px 20px 22px', color: '#fff' }}>
         <div style={{ minWidth: 0 }}>
           {post.caption && <p style={{ margin: 0, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.caption}</p>}
@@ -102,12 +105,32 @@ export function PostCarousel({ post, onClose, onDelete }: PostCarouselProps) {
             {new Date(post.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
           </p>
         </div>
-        <button
-          onClick={() => setConfirming(true)}
-          style={{ flexShrink: 0, background: 'none', border: 'none', color: theme.rose, cursor: 'pointer', fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
-        >
-          Delete{multi ? ' post' : ''}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+          {onAppend && (
+            <label style={{ cursor: uploading ? 'default' : 'pointer', opacity: uploading ? 0.5 : 1, fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#fff' }}>
+              {uploading ? `${uploadProgress?.done ?? 0}/${uploadProgress?.total ?? 0}…` : 'Add more'}
+              <input
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                disabled={uploading}
+                onChange={(e) => {
+                  if (e.target.files?.length) {
+                    onAppend(post.postId, Array.from(e.target.files));
+                  }
+                  e.target.value = '';
+                }}
+                style={{ display: 'none' }}
+              />
+            </label>
+          )}
+          <button
+            onClick={() => setConfirming(true)}
+            style={{ background: 'none', border: 'none', color: theme.rose, cursor: 'pointer', fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase' }}
+          >
+            Delete{multi ? ' post' : ''}
+          </button>
+        </div>
       </div>
 
       {/* Confirm */}

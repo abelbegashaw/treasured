@@ -17,7 +17,7 @@ interface ItemPhotosModalProps {
 // completed bucket item. Portal + scroll lock (no transformed-ancestor trap).
 export function ItemPhotosModal({ item, onClose, onChanged }: ItemPhotosModalProps) {
   const theme = useTheme();
-  const { posts, loading, uploading, uploadProgress, error, addPost, removePost } = useItemPhotos(item.id, onChanged);
+  const { posts, loading, uploading, uploadProgress, error, addPost, appendToPost, removePost } = useItemPhotos(item.id, onChanged);
 
   // Which post's carousel is open (by postId).
   const [openPostId, setOpenPostId] = useState<string | null>(null);
@@ -105,8 +105,11 @@ export function ItemPhotosModal({ item, onClose, onChanged }: ItemPhotosModalPro
       {openPost && (
         <PostCarousel
           post={openPost}
+          uploading={uploading}
+          uploadProgress={uploadProgress}
           onClose={() => setOpenPostId(null)}
           onDelete={(postId) => { removePost(postId); setOpenPostId(null); }}
+          onAppend={appendToPost}
         />
       )}
     </div>,
